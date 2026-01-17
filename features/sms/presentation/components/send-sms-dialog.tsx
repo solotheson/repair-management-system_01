@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/core/store/hooks"
-import { addMessage, updateBalance } from "../../data/slice"
+import { addMessage, updateBalance } from "../slice"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"

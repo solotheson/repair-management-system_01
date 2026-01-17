@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit"
-import authReducer from "@/features/auth/data/slice"
-import servicesReducer from "@/features/services/data/slice"
-import customersReducer from "@/features/customers/data/slice"
-import smsReducer from "@/features/sms/data/slice"
-import usersReducer from "@/features/users/data/slice"
+import authReducer from "@/features/auth/presentation/slice"
+import servicesReducer from "@/features/services/presentation/slice"
+import customersReducer from "@/features/customers/presentation/slice"
+import smsReducer from "@/features/sms/presentation/slice"
+import usersReducer from "@/features/users/presentation/slice"
 
 export const store = configureStore({
   reducer: {

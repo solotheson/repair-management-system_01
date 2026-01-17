@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
-import { updateServiceStatus, deleteService } from "@/features/services/data/slice"
+import { updateServiceStatus, deleteService } from "@/features/services/presentation/slice"
 import { ServiceStatus } from "@/features/services/domain/enums/service-status"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"

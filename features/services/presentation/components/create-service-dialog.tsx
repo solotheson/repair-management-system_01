@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/core/store/hooks"
-import { createService } from "../../data/slice"
+import { createService } from "../slice"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

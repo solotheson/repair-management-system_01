@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
-import { deleteUser } from "@/features/users/data/slice"
+import { deleteUser } from "@/features/users/presentation/slice"
 import { UserRole } from "@/features/auth/domain/enums/user-role"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"

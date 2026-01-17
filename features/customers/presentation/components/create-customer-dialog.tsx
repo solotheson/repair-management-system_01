@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useAppDispatch } from "@/core/store/hooks"
-import { createCustomer } from "../../data/slice"
+import { createCustomer } from "../slice"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"

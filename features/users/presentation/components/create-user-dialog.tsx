@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { useAppDispatch } from "@/core/store/hooks"
-import { createUser } from "../../data/slice"
+import { createUser } from "../slice"
 import { UserRole } from "@/features/auth/domain/enums/user-role"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

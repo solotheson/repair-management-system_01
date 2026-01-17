@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
-import { logout } from "@/features/auth/data/slice"
+import { logout } from "@/features/auth/presentation/slice"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,

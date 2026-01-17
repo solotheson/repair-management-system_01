@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
-import { updateBalance, addMessage } from "@/features/sms/data/slice"
+import { updateBalance, addMessage } from "@/features/sms/presentation/slice"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
