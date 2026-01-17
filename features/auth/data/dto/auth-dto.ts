@@ -1,5 +1,5 @@
 export interface LoginRequestDTO {
-  email: string
+  id: string
   password: string
 }
 
@@ -8,6 +8,13 @@ export interface RegisterRequestDTO {
   password: string
   name: string
   phone?: string
+}
+
+export interface BootstrapRequestDTO {
+  email: string
+  password: string
+  first_name: string
+  last_name: string
 }
 
 export interface UserDTO {

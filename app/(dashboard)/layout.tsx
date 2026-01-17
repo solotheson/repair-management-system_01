@@ -6,10 +6,7 @@ import { useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
 import { setUser } from "@/features/auth/presentation/slice"
-import { setMockServices } from "@/features/services/presentation/slice"
-import { setMockCustomers } from "@/features/customers/presentation/slice"
-import { setMockData as setMockSmsData } from "@/features/sms/presentation/slice"
-import { setMockUsers } from "@/features/users/presentation/slice"
+import { fetchWorkspaces } from "@/features/workspaces/presentation/slice"
 import { DashboardSidebar } from "@/components/dashboard/sidebar"
 import { DashboardHeader } from "@/components/dashboard/header"
 import { UserRole } from "@/features/auth/domain/enums/user-role"
@@ -24,25 +21,30 @@ export default function DashboardLayout({
   const { isAuthenticated, user } = useAppSelector((state) => state.auth)
 
   useEffect(() => {
-    // For demo, set mock user if not authenticated
-    if (!isAuthenticated) {
-      dispatch(
-        setUser({
-          id: "u1",
-          email: "admin@techserve.com",
-          name: "Admin User",
-          role: UserRole.SUPER_ADMIN,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }),
-      )
+    if (typeof window === "undefined") {
+      return
     }
-    // Load mock data
-    dispatch(setMockServices())
-    dispatch(setMockCustomers())
-    dispatch(setMockSmsData())
-    dispatch(setMockUsers())
-  }, [dispatch, isAuthenticated])
+
+    const accessToken = localStorage.getItem("accessToken")
+
+    if (!accessToken) {
+      router.replace("/login")
+      return
+    }
+
+    if (!isAuthenticated) {
+      const storedUser = localStorage.getItem("user")
+      if (storedUser) {
+        try {
+          const parsedUser = JSON.parse(storedUser)
+          dispatch(setUser(parsedUser))
+        } catch {
+        }
+      }
+    }
+
+    dispatch(fetchWorkspaces())
+  }, [dispatch, isAuthenticated, router])
 
   return (
     <div className="min-h-screen bg-background">

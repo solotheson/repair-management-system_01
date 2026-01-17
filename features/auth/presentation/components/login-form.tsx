@@ -6,14 +6,13 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { useAppDispatch, useAppSelector } from "@/core/store/hooks"
-import { setUser } from "../slice"
+import { login } from "../slice"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle } from "lucide-react"
-import { UserRole } from "../../domain/enums/user-role"
 
 export function LoginForm() {
   const dispatch = useAppDispatch()
@@ -25,18 +24,16 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // For demo, simulate login
-    dispatch(
-      setUser({
-        id: "u1",
-        email: email,
-        name: "Demo User",
-        role: UserRole.SUPER_ADMIN,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    const resultAction = await dispatch(
+      login({
+        email,
+        password,
       }),
     )
-    router.push("/dashboard")
+
+    if (login.fulfilled.match(resultAction)) {
+      router.push("/dashboard")
+    }
   }
 
   return (

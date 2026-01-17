@@ -2,6 +2,7 @@ import type {
   IAuthRepository,
   LoginCredentials,
   RegisterData,
+  BootstrapData,
   AuthResponse,
 } from "../../domain/repositories/auth-repository"
 import type { User } from "../../domain/entities/user"
@@ -13,7 +14,7 @@ export class AuthRepositoryImpl implements IAuthRepository {
 
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     const dto = await this.datasource.login({
-      email: credentials.email,
+      id: credentials.email,
       password: credentials.password,
     })
     return AuthMapper.toAuthResponse(dto)
@@ -26,6 +27,20 @@ export class AuthRepositoryImpl implements IAuthRepository {
       name: data.name,
       phone: data.phone,
     })
+    return AuthMapper.toAuthResponse(dto)
+  }
+
+  async bootstrapSuperadmin(data: BootstrapData): Promise<AuthResponse> {
+    const dto = await this.datasource.bootstrapSuperadmin(
+      {
+        email: data.email,
+        password: data.password,
+        first_name: data.firstName,
+        last_name: data.lastName,
+      },
+      "change_me_too"
+      // data.bootstrapToken,
+    )
     return AuthMapper.toAuthResponse(dto)
   }
 
