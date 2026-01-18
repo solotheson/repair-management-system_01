@@ -21,13 +21,13 @@ import {
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/services", label: "Services", icon: Wrench },
-  { href: "/dashboard/customers", label: "Customers", icon: Users },
+  // { href: "/dashboard/customers", label: "Customers", icon: Users },
   { href: "/dashboard/workspaces", label: "Workspaces", icon: Wrench },
   { href: "/dashboard/members", label: "Members", icon: Users },
   { href: "/dashboard/sms", label: "SMS", icon: MessageSquare },
   { href: "/dashboard/broadcast", label: "Broadcast", icon: Radio },
   { href: "/dashboard/credits", label: "SMS Credits", icon: CreditCard },
-  { href: "/dashboard/users", label: "User Management", icon: UserCog },
+  // { href: "/dashboard/users", label: "User Management", icon: UserCog },
 ]
 
 export function DashboardSidebar() {
