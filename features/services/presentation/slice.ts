@@ -44,11 +44,15 @@ export const createService = createAsyncThunk(
 export const completeService = createAsyncThunk(
   "services/complete",
   async (
-    { workspaceId, serviceId }: { workspaceId: string; serviceId: string },
+    {
+      workspaceId,
+      serviceId,
+      message,
+    }: { workspaceId: string; serviceId: string; message?: string | null },
     { rejectWithValue },
   ) => {
     try {
-      return await repository.complete(workspaceId, serviceId)
+      return await repository.complete(workspaceId, serviceId, message)
     } catch (error: unknown) {
       const err = error as Error
       return rejectWithValue(err.message)

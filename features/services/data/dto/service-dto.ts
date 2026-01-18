@@ -35,3 +35,7 @@ export interface CreateServiceRequestDTO {
     serial_number?: string | null
   }
 }
+
+export interface ServiceMessageRequestDTO {
+  message: string
+}

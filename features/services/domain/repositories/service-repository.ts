@@ -21,5 +21,6 @@ export interface CreateServiceData {
 export interface IServiceRepository {
   list(workspaceId: string): Promise<Service[]>
   create(workspaceId: string, data: CreateServiceData): Promise<Service>
-  complete(workspaceId: string, serviceId: string): Promise<Service>
+  complete(workspaceId: string, serviceId: string, message?: string | null): Promise<Service>
+  sendMessage(workspaceId: string, serviceId: string, message: string): Promise<void>
 }

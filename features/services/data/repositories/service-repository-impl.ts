@@ -34,11 +34,23 @@ export class ServiceRepositoryImpl implements IServiceRepository {
     return ServiceMapper.toEntity(dto)
   }
 
-  async complete(workspaceId: string, serviceId: string): Promise<Service> {
-    const dto = await this.datasource.complete(workspaceId, serviceId)
+  async complete(
+    workspaceId: string,
+    serviceId: string,
+    message?: string | null,
+  ): Promise<Service> {
+    const dto = await this.datasource.complete(workspaceId, serviceId, message ?? null)
     if (!dto) {
       throw new Error("Failed to complete service")
     }
     return ServiceMapper.toEntity(dto)
+  }
+
+  async sendMessage(
+    workspaceId: string,
+    serviceId: string,
+    message: string,
+  ): Promise<void> {
+    await this.datasource.sendMessage(workspaceId, serviceId, { message })
   }
 }
