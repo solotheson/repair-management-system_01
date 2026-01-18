@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useAppSelector, useAppDispatch } from "@/core/store/hooks"
-import { updateServiceStatus, deleteService } from "@/features/services/presentation/slice"
+import { fetchServices, completeService } from "@/features/services/presentation/slice"
 import { ServiceStatus } from "@/features/services/domain/enums/service-status"
+import { setSelectedWorkspaceId } from "@/features/workspaces/presentation/slice"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -25,46 +26,41 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
-import { Plus, Search, MoreHorizontal, MessageSquare, Trash2 } from "lucide-react"
+import { Plus, Search, MoreHorizontal, MessageSquare } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { CreateServiceDialog } from "@/features/services/presentation/components/create-service-dialog"
 import { SendSmsDialog } from "@/features/sms/presentation/components/send-sms-dialog"
 
 export default function ServicesPage() {
   const dispatch = useAppDispatch()
   const { services, isLoading } = useAppSelector((state) => state.services)
+  const { selectedWorkspaceId, items: workspaces } = useAppSelector((state) => state.workspaces)
   const [search, setSearch] = useState("")
   const [createOpen, setCreateOpen] = useState(false)
   const [smsOpen, setSmsOpen] = useState(false)
-  const [deleteOpen, setDeleteOpen] = useState(false)
   const [selectedForSms, setSelectedForSms] = useState<{ phone: string; name: string } | null>(null)
-  const [selectedForDelete, setSelectedForDelete] = useState<string | null>(null)
 
-  const filteredServices = services.filter(
-    (service) =>
-      service.title.toLowerCase().includes(search.toLowerCase()) ||
-      service.customerName.toLowerCase().includes(search.toLowerCase()),
-  )
+  useEffect(() => {
+    if (selectedWorkspaceId) {
+      dispatch(fetchServices(selectedWorkspaceId))
+    }
+  }, [dispatch, selectedWorkspaceId])
 
-  const handleStatusChange = (id: string, status: ServiceStatus) => {
-    dispatch(updateServiceStatus({ id, status }))
+  const filteredServices = services.filter((service) => {
+    const query = search.toLowerCase()
+    const title = (service.title || "").toLowerCase()
+    const customerName = (service.customerName || "").toLowerCase()
+    return title.includes(query) || customerName.includes(query)
+  })
+
+  const handleComplete = (id: string) => {
+    if (!selectedWorkspaceId) return
+    dispatch(completeService({ workspaceId: selectedWorkspaceId, serviceId: id }))
   }
 
   const handleSendSms = (phone: string, name: string) => {
     setSelectedForSms({ phone, name })
     setSmsOpen(true)
-  }
-
-  const handleDelete = (id: string) => {
-    setSelectedForDelete(id)
-    setDeleteOpen(true)
-  }
-
-  const confirmDelete = () => {
-    if (selectedForDelete) {
-      dispatch(deleteService(selectedForDelete))
-      setDeleteOpen(false)
-      setSelectedForDelete(null)
-    }
   }
 
   const getStatusBadge = (status: ServiceStatus) => {
@@ -88,10 +84,27 @@ export default function ServicesPage() {
           <h1 className="text-2xl font-bold text-foreground">Services</h1>
           <p className="text-muted-foreground">Manage your service requests</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          New Service
-        </Button>
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+          <Select
+            value={selectedWorkspaceId ?? ""}
+            onValueChange={(value) => dispatch(setSelectedWorkspaceId(value))}
+          >
+            <SelectTrigger className="w-[220px]">
+              <SelectValue placeholder="Select workspace" />
+            </SelectTrigger>
+            <SelectContent>
+              {workspaces.map((w) => (
+                <SelectItem key={w.id} value={w.id}>
+                  {w.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button onClick={() => setCreateOpen(true)} disabled={!selectedWorkspaceId}>
+            <Plus className="h-4 w-4 mr-2" />
+            New Service
+          </Button>
+        </div>
       </div>
 
       <Card className="border-border">
@@ -109,83 +122,80 @@ export default function ServicesPage() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-lg border border-border overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead>Service</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Scheduled</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead className="w-[80px]">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredServices.map((service) => (
-                  <TableRow key={service.id}>
-                    <TableCell>
-                      <div>
-                        <p className="font-medium text-foreground">{service.title}</p>
-                        <p className="text-sm text-muted-foreground truncate max-w-[200px]">{service.description}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <p className="text-foreground">{service.customerName}</p>
-                        <p className="text-sm text-muted-foreground">{service.customerPhone}</p>
-                      </div>
-                    </TableCell>
-                    <TableCell>{getStatusBadge(service.status)}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(service.scheduledAt).toLocaleDateString()}
-                    </TableCell>
-                    <TableCell className="text-foreground font-medium">{service.price.toLocaleString()} TSH</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleSendSms(service.customerPhone, service.customerName)}>
-                            <MessageSquare className="h-4 w-4 mr-2" />
-                            Send SMS
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuLabel>Update Status</DropdownMenuLabel>
-                          {Object.values(ServiceStatus).map((status) => (
+          {!selectedWorkspaceId ? (
+            <p className="text-sm text-muted-foreground">
+              Select a workspace to view its services.
+            </p>
+          ) : (
+            <div className="rounded-lg border border-border overflow-hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead>Service</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Scheduled</TableHead>
+                    <TableHead className="w-[80px]">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredServices.map((service) => (
+                    <TableRow key={service.id}>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium text-foreground">{service.title}</p>
+                          <p className="text-sm text-muted-foreground truncate max-w-[200px]">
+                            {service.description}
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="text-foreground">{service.customerName}</p>
+                          <p className="text-sm text-muted-foreground">{service.customerPhone}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell>{getStatusBadge(service.status)}</TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {new Date(service.createdAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuItem
-                              key={status}
-                              onClick={() => handleStatusChange(service.id, status)}
-                              disabled={service.status === status}
+                              onClick={() => handleSendSms(service.customerPhone, service.customerName)}
                             >
-                              {status.replace("_", " ")}
+                              <MessageSquare className="h-4 w-4 mr-2" />
+                              Send SMS
                             </DropdownMenuItem>
-                          ))}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem onClick={() => handleDelete(service.id)} className="text-destructive">
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {filteredServices.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
-                      No services found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+                            <DropdownMenuSeparator />
+                            {service.status !== ServiceStatus.COMPLETED && (
+                              <DropdownMenuItem onClick={() => handleComplete(service.id)}>
+                                Mark as completed
+                              </DropdownMenuItem>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                  {filteredServices.length === 0 && (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                        No services found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -199,25 +209,6 @@ export default function ServicesPage() {
           recipientName={selectedForSms.name}
         />
       )}
-
-      <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Service</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this service? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={confirmDelete}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }

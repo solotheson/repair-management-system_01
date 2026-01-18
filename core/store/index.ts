@@ -5,7 +5,6 @@ import customersReducer from "@/features/customers/presentation/slice"
 import smsReducer from "@/features/sms/presentation/slice"
 import usersReducer from "@/features/users/presentation/slice"
 import workspacesReducer from "@/features/workspaces/presentation/slice"
-import repairsReducer from "@/features/repairs/presentation/slice"
 
 export const store = configureStore({
   reducer: {
@@ -15,7 +14,6 @@ export const store = configureStore({
     sms: smsReducer,
     users: usersReducer,
     workspaces: workspacesReducer,
-    repairs: repairsReducer,
   },
 })
 

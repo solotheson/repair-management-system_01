@@ -1,56 +1,44 @@
-import type {
-  IServiceRepository,
-  CreateServiceData,
-  UpdateServiceData,
-} from "../../domain/repositories/service-repository"
+import type { IServiceRepository, CreateServiceData } from "../../domain/repositories/service-repository"
 import type { Service } from "../../domain/entities/service"
-import type { ServiceStatus } from "../../domain/enums/service-status"
 import { ServiceDatasource } from "../datasources/service-datasource"
 import { ServiceMapper } from "../mappers/service-mapper"
 
 export class ServiceRepositoryImpl implements IServiceRepository {
   private datasource = new ServiceDatasource()
 
-  async getAll(): Promise<Service[]> {
-    const dtos = await this.datasource.getAll()
-    return ServiceMapper.toEntityList(dtos)
+  async list(workspaceId: string): Promise<Service[]> {
+    const dtos = await this.datasource.list(workspaceId)
+    return ServiceMapper.toEntityList(dtos ?? [])
   }
 
-  async getById(id: string): Promise<Service> {
-    const dto = await this.datasource.getById(id)
-    return ServiceMapper.toEntity(dto)
-  }
-
-  async create(data: CreateServiceData): Promise<Service> {
-    const dto = await this.datasource.create({
-      title: data.title,
-      description: data.description,
-      customer_id: data.customerId,
-      scheduled_at: data.scheduledAt,
-      price: data.price,
-      notes: data.notes,
+  async create(workspaceId: string, data: CreateServiceData): Promise<Service> {
+    const dto = await this.datasource.create(workspaceId, {
+      customer: {
+        name: data.customer.name,
+        telephone_number: data.customer.telephoneNumber,
+      },
+      issue_description: data.issueDescription,
+      message: data.message ?? null,
+      item: data.item
+        ? {
+            type: data.item.type ?? null,
+            brand: data.item.brand ?? null,
+            model: data.item.model ?? null,
+            serial_number: data.item.serialNumber ?? null,
+          }
+        : undefined,
     })
+    if (!dto) {
+      throw new Error("Failed to create service")
+    }
     return ServiceMapper.toEntity(dto)
   }
 
-  async update(id: string, data: UpdateServiceData): Promise<Service> {
-    const dto = await this.datasource.update(id, {
-      title: data.title,
-      description: data.description,
-      status: data.status,
-      scheduled_at: data.scheduledAt,
-      price: data.price,
-      notes: data.notes,
-    })
-    return ServiceMapper.toEntity(dto)
-  }
-
-  async delete(id: string): Promise<void> {
-    await this.datasource.delete(id)
-  }
-
-  async updateStatus(id: string, status: ServiceStatus): Promise<Service> {
-    const dto = await this.datasource.updateStatus(id, status)
+  async complete(workspaceId: string, serviceId: string): Promise<Service> {
+    const dto = await this.datasource.complete(workspaceId, serviceId)
+    if (!dto) {
+      throw new Error("Failed to complete service")
+    }
     return ServiceMapper.toEntity(dto)
   }
 }

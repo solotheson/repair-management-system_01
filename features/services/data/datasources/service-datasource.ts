@@ -1,33 +1,44 @@
 import { axiosInstance } from "@/core/api/axios-instance"
-import type { ServiceDTO, CreateServiceRequestDTO, UpdateServiceRequestDTO } from "../dto/service-dto"
+import type { ServiceDTO, CreateServiceRequestDTO } from "../dto/service-dto"
 
 export class ServiceDatasource {
-  async getAll(): Promise<ServiceDTO[]> {
-    const response = await axiosInstance.get<ServiceDTO[]>("/services")
-    return response.data
+  async list(workspaceId: string): Promise<ServiceDTO[] | null> {
+    try {
+      const response = await axiosInstance.get<{ repairs: ServiceDTO[] }>(
+        `/v1/workspaces/${workspaceId}/repairs`,
+      )
+      return response.data.repairs
+    } catch (error) {
+      console.error("Failed to fetch services", error)
+      return null
+    }
   }
 
-  async getById(id: string): Promise<ServiceDTO> {
-    const response = await axiosInstance.get<ServiceDTO>(`/services/${id}`)
-    return response.data
+  async create(
+    workspaceId: string,
+    data: CreateServiceRequestDTO,
+  ): Promise<ServiceDTO | null> {
+    try {
+      const response = await axiosInstance.post<ServiceDTO>(
+        `/v1/workspaces/${workspaceId}/repairs`,
+        data,
+      )
+      return response.data
+    } catch (error) {
+      console.error("Failed to create service", error)
+      return null
+    }
   }
 
-  async create(data: CreateServiceRequestDTO): Promise<ServiceDTO> {
-    const response = await axiosInstance.post<ServiceDTO>("/services", data)
-    return response.data
-  }
-
-  async update(id: string, data: UpdateServiceRequestDTO): Promise<ServiceDTO> {
-    const response = await axiosInstance.put<ServiceDTO>(`/services/${id}`, data)
-    return response.data
-  }
-
-  async delete(id: string): Promise<void> {
-    await axiosInstance.delete(`/services/${id}`)
-  }
-
-  async updateStatus(id: string, status: string): Promise<ServiceDTO> {
-    const response = await axiosInstance.patch<ServiceDTO>(`/services/${id}/status`, { status })
-    return response.data
+  async complete(workspaceId: string, serviceId: string): Promise<ServiceDTO | null> {
+    try {
+      const response = await axiosInstance.post<ServiceDTO>(
+        `/v1/workspaces/${workspaceId}/repairs/${serviceId}/complete`,
+      )
+      return response.data
+    } catch (error) {
+      console.error("Failed to complete service", error)
+      return null
+    }
   }
 }
