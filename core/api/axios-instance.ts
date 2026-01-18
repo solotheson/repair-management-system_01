@@ -1,6 +1,8 @@
 import axios from "axios"
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.example.com"
+// const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.example.com"
+
+const API_BASE_URL = "http://192.168.1.136:3000/repair";
 
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,

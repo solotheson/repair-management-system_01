@@ -57,8 +57,10 @@ export const bootstrapSuperadmin = createAsyncThunk(
       }
       return result
     } catch (error: unknown) {
-      const err = error as Error
-      return rejectWithValue(err.message || "Bootstrap failed")
+      const anyError = error as any
+      const backendMessage = anyError?.response?.data?.message
+      const message = backendMessage || (anyError as Error).message || "Bootstrap failed"
+      return rejectWithValue(message)
     }
   },
 )
@@ -132,4 +134,3 @@ const authSlice = createSlice({
 
 export const { clearError, setUser } = authSlice.actions
 export default authSlice.reducer
-

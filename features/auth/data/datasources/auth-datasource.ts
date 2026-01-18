@@ -4,6 +4,7 @@ import type { LoginRequestDTO, RegisterRequestDTO, BootstrapRequestDTO, AuthResp
 export class AuthDatasource {
   async login(data: LoginRequestDTO): Promise<AuthResponseDTO> {
     const response = await axiosInstance.post<AuthResponseDTO>("/v1/auth/login", data)
+    console.log('checking login response ',response);
     return response.data
   }
 
@@ -13,7 +14,7 @@ export class AuthDatasource {
   }
 
   async bootstrapSuperadmin(data: BootstrapRequestDTO, token: string): Promise<AuthResponseDTO> {
-    const response = await axiosInstance.post<AuthResponseDTO>("/repair/admin/v1/superadmin/bootstrap", data, {
+    const response = await axiosInstance.post<AuthResponseDTO>("/admin/v1/superadmin/bootstrap", data, {
       headers: {
         "X-Bootstrap-Token": token,
       },
