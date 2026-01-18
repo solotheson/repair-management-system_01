@@ -12,6 +12,9 @@ export class CreateCustomerUseCase {
     if (!data.email || !data.email.includes("@")) {
       throw new ValidationError("Invalid email address")
     }
+    if (!data.password || data.password.length < 6) {
+      throw new ValidationError("Password must be at least 6 characters")
+    }
     if (!data.phone || data.phone.length < 10) {
       throw new ValidationError("Invalid phone number")
     }

@@ -9,15 +9,10 @@ export class AddWorkspaceMemberUseCase {
   constructor(private repository: IWorkspaceMemberRepository) {}
 
   async execute(workspaceId: string, data: AddWorkspaceMemberData): Promise<WorkspaceMember> {
-    if (!data.userId) {
-      throw new ValidationError("User is required")
-    }
-
-    if (!data.role) {
-      throw new ValidationError("Role is required")
+    if (!data.email || !data.email.includes("@")) {
+      throw new ValidationError("Invalid email address")
     }
 
     return this.repository.add(workspaceId, data)
   }
 }
-

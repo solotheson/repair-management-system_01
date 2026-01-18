@@ -11,19 +11,26 @@ export class WorkspaceMemberRepositoryImpl implements IWorkspaceMemberRepository
 
   async list(workspaceId: string): Promise<WorkspaceMember[]> {
     const dtos = await this.datasource.listMembers(workspaceId)
-    return WorkspaceMapper.toWorkspaceMemberList(dtos)
+    return WorkspaceMapper.toWorkspaceMemberList(dtos ?? [])
   }
 
   async add(workspaceId: string, data: AddWorkspaceMemberData): Promise<WorkspaceMember> {
     const dto = await this.datasource.addMember(workspaceId, {
-      user_id: data.userId,
+      email: data.email,
+      password: data.password,
+      first_name: data.firstName ?? null,
+      last_name: data.lastName ?? null,
+      telephone_number: data.telephoneNumber ?? null,
       role: data.role,
     })
-    return WorkspaceMapper.toWorkspaceMember(dto)
+    if (!dto) {
+      throw new Error("Failed to add workspace member")
+    }
+    const memberDto = (dto as any).member ?? dto
+    return WorkspaceMapper.toWorkspaceMember(memberDto)
   }
 
   async remove(workspaceId: string, memberId: string): Promise<void> {
     await this.datasource.removeMember(workspaceId, memberId)
   }
 }
-

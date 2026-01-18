@@ -7,9 +7,16 @@ export interface Workspace {
 
 export interface WorkspaceMember {
   id: string
-  workspaceId: string
   userId: string
+  email: string
+  firstName: string
+  lastName: string
+  telephoneNumber: string | null
   role: string
+  status: string
+  userRole: string
+  userStatus: string
+  joinedAt: string
   createdAt: string
   updatedAt: string
 }
@@ -22,4 +29,3 @@ export interface WorkspacesState {
   isMembersLoading: boolean
   error: string | null
 }
-

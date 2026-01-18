@@ -11,14 +11,21 @@ export class WorkspaceRepositoryImpl implements IWorkspaceRepository {
 
   async getAll(): Promise<Workspace[]> {
     const dtos = await this.datasource.getAll()
-    return WorkspaceMapper.toWorkspaceList(dtos)
+    return WorkspaceMapper.toWorkspaceList(dtos ?? [])
   }
 
   async create(data: CreateWorkspaceData): Promise<Workspace> {
     const dto = await this.datasource.create({
       name: data.name,
+      owner: {
+        email: data.ownerEmail,
+        password: data.ownerPassword,
+      },
     })
-    return WorkspaceMapper.toWorkspace(dto)
+    if (!dto) {
+      throw new Error("Failed to create workspace")
+    }
+    const workspaceDto = (dto as any).workspace ?? dto
+    return WorkspaceMapper.toWorkspace(workspaceDto)
   }
 }
-

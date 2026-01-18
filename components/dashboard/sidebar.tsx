@@ -6,12 +6,24 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { LayoutDashboard, Wrench, Users, MessageSquare, CreditCard, UserCog, Radio, Menu, X } from "lucide-react"
+import {
+  LayoutDashboard,
+  Wrench,
+  Users,
+  MessageSquare,
+  CreditCard,
+  UserCog,
+  Radio,
+  Menu,
+  X,
+} from "lucide-react"
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/dashboard/services", label: "Services", icon: Wrench },
   { href: "/dashboard/customers", label: "Customers", icon: Users },
+  { href: "/dashboard/workspaces", label: "Workspaces", icon: Wrench },
+  { href: "/dashboard/members", label: "Members", icon: Users },
   { href: "/dashboard/sms", label: "SMS", icon: MessageSquare },
   { href: "/dashboard/broadcast", label: "Broadcast", icon: Radio },
   { href: "/dashboard/credits", label: "SMS Credits", icon: CreditCard },

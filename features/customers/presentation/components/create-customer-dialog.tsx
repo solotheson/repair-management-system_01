@@ -29,9 +29,11 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
-    email: "",
-    phone: "",
-    address: "",
+    ownerEmail: "",
+    ownerPassword: "",
+    ownerFirstName: "",
+    ownerLastName: "",
+    ownerPhone: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,14 +43,23 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
     await dispatch(
       createCustomer({
         name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        address: formData.address || undefined,
+        email: formData.ownerEmail,
+        password: formData.ownerPassword,
+        firstName: formData.ownerFirstName || undefined,
+        lastName: formData.ownerLastName || undefined,
+        phone: formData.ownerPhone,
       }),
     )
 
     setIsLoading(false)
-    setFormData({ name: "", email: "", phone: "", address: "" })
+    setFormData({
+      name: "",
+      ownerEmail: "",
+      ownerPassword: "",
+      ownerFirstName: "",
+      ownerLastName: "",
+      ownerPhone: "",
+    })
     onOpenChange(false)
   }
 
@@ -62,7 +73,7 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
         <form onSubmit={handleSubmit}>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
+              <Label htmlFor="name">Workspace / Organization Name</Label>
               <Input
                 id="name"
                 value={formData.name}
@@ -72,34 +83,55 @@ export function CreateCustomerDialog({ open, onOpenChange }: CreateCustomerDialo
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="ownerEmail">Owner Email</Label>
               <Input
-                id="email"
+                id="ownerEmail"
                 type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="john@example.com"
+                value={formData.ownerEmail}
+                onChange={(e) => setFormData({ ...formData, ownerEmail: e.target.value })}
+                placeholder="owner@example.com"
                 required
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="ownerPassword">Owner Password</Label>
               <Input
-                id="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="+255712345678"
+                id="ownerPassword"
+                type="password"
+                value={formData.ownerPassword}
+                onChange={(e) => setFormData({ ...formData, ownerPassword: e.target.value })}
+                placeholder="Min 6 characters"
                 required
               />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="ownerFirstName">Owner First Name (optional)</Label>
+                <Input
+                  id="ownerFirstName"
+                  value={formData.ownerFirstName}
+                  onChange={(e) => setFormData({ ...formData, ownerFirstName: e.target.value })}
+                  placeholder="John"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="ownerLastName">Owner Last Name (optional)</Label>
+                <Input
+                  id="ownerLastName"
+                  value={formData.ownerLastName}
+                  onChange={(e) => setFormData({ ...formData, ownerLastName: e.target.value })}
+                  placeholder="Doe"
+                />
+              </div>
+            </div>
             <div className="space-y-2">
-              <Label htmlFor="address">Address (optional)</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="123 Main St, City"
+              <Label htmlFor="ownerPhone">Owner Phone (optional)</Label>
+              <Input
+                id="ownerPhone"
+                type="tel"
+                value={formData.ownerPhone}
+                onChange={(e) => setFormData({ ...formData, ownerPhone: e.target.value })}
+                placeholder="+255712345678"
               />
             </div>
           </div>
